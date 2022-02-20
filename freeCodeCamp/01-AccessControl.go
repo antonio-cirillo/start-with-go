@@ -30,4 +30,5 @@ func main() {
 
 	fmt.Printf("Is Admin? %v\n", roles&isAdmin == isAdmin)                      // True
 	fmt.Printf("Is Headquarters? %v\n", roles&isHeadquarters == isHeadquarters) // False
+
 }
