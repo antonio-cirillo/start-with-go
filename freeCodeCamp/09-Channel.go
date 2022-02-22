@@ -5,22 +5,37 @@ import (
 	"time"
 )
 
+const (
+	logInfo    = "INFO"
+	logWarning = "WARNING"
+	logError   = "ERROR"
+)
+
+type logEntry struct {
+	time     time.Time
+	severity string
+	message  string
+}
+
+var logCh = make(chan logEntry, 50)
+
 func main() {
 
-	c1 := make(chan string)
-	c2 := make(chan string)
+	go logger()
 
-	go func() {
-		time.Sleep(1 * time.Second)
-		c1 <- "one"
+	defer func() {
+		close(logCh)
 	}()
 
-	go func() {
-		time.Sleep(2 * time.Second)
-		c2 <- "two"
-	}()
+	logCh <- logEntry{time.Now(), logInfo, "App is starting"}
+	logCh <- logEntry{time.Now(), logInfo, "App is shutting down"}
 
-	fmt.Println("received", <-c2)
-	fmt.Println("received", <-c1)
+	time.Sleep(100 * time.Millisecond)
 
+}
+
+func logger() {
+	for entry := range logCh {
+		fmt.Printf("%v - [%v] %v\n", entry.time.Format("2006-01-02T15:04:05"), entry.severity, entry.message)
+	}
 }
